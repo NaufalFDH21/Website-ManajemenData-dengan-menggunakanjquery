@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tugas Akhir Sesi: CRUD jQuery</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fdf6ee;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      .container {
+        max-width: 850px;
+        margin: 50px auto;
+        background-color: #fffdf9;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 28px;
+        color: #243642;
+        margin-bottom: 10px;
+      }
+
+      p.subtitle {
+        text-align: center;
+        color: #555;
+        margin-bottom: 40px;
+        font-size: 16px;
+      }
+
+      .card {
+        background-color: #fff;
+        border: 1px solid #e0cbb2;
+        border-radius: 10px;
+        padding: 20px 25px;
+        margin-bottom: 25px;
+        transition: 0.3s;
+        cursor: pointer;
+      }
+
+      .card:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .card h2 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f4e3d3;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+        font-size: 14px;
+      }
+
+      .btn-add {
+        background-color: #3498db;
+      }
+      .btn-edit {
+        background-color: #f1c40f;
+      }
+      .btn-delete {
+        background-color: #e74c3c;
+      }
+      .btn-save {
+        background-color: #2ecc71;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 14px;
+        color: #777;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tugas Akhir Sesi: Implementasi Praktis</h1>
+      <p class="subtitle">
+        Menerapkan pengetahuan Pada sesi perkuliahan dengan membangun aplikasi
+        web fungsional menggunakan <strong>jQuery</strong>.
+      </p>
+
+      <div class="card">
+        <h2>Manajemen Data Produk</h2>
+
+        <input
+          type="text"
+          id="namaProduk"
+          placeholder="Masukkan nama produk..."
+        />
+        <input
+          type="text"
+          id="hargaProduk"
+          placeholder="Masukkan harga produk..."
+        />
+        <button class="btn btn-add" id="tambahData">Tambah Data</button>
+
+        <table id="tabelProduk">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Produk</th>
+              <th>Harga</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data akan muncul di sini -->
+          </tbody>
+        </table>
+      </div>
+
+      <footer>&copy; 2025 | Muhammad Naufal Fadhillah (1247050023)</footer>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        let produkList = [];
+        let editIndex = -1;
+
+        // Tambah data
+        $("#tambahData").click(function () {
+          const nama = $("#namaProduk").val().trim();
+          const harga = $("#hargaProduk").val().trim();
+
+          if (nama === "" || harga === "") {
+            alert("Nama dan harga produk wajib diisi!");
+            return;
+          }
+
+          if (editIndex === -1) {
+            produkList.push({ nama, harga });
+          } else {
+            produkList[editIndex] = { nama, harga };
+            editIndex = -1;
+            $("#tambahData")
+              .text("Tambah Data")
+              .removeClass("btn-save")
+              .addClass("btn-add");
+          }
+
+          $("#namaProduk").val("");
+          $("#hargaProduk").val("");
+          tampilkanData();
+        });
+
+        // Tampilkan data
+        function tampilkanData() {
+          let rows = "";
+          produkList.forEach((p, index) => {
+            rows += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${p.nama}</td>
+              <td>${p.harga}</td>
+              <td>
+                <button class="btn btn-edit" onclick="editData(${index})">Edit</button>
+                <button class="btn btn-delete" onclick="hapusData(${index})">Hapus</button>
+              </td>
+            </tr>
+          `;
+          });
+          $("#tabelProduk tbody").html(rows);
+        }
+
+        // Fungsi edit
+        window.editData = function (index) {
+          const produk = produkList[index];
+          $("#namaProduk").val(produk.nama);
+          $("#hargaProduk").val(produk.harga);
+          editIndex = index;
+          $("#tambahData")
+            .text("Simpan Perubahan")
+            .removeClass("btn-add")
+            .addClass("btn-save");
+        };
+
+        // Fungsi hapus
+        window.hapusData = function (index) {
+          if (confirm("Yakin ingin menghapus data ini?")) {
+            produkList.splice(index, 1);
+            tampilkanData();
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
